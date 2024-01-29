@@ -1,6 +1,29 @@
-npx playwright test test/miam_test.spec.ts => test main test
+# e2e-miam
 
-npx playwright show-report => see tests results
+## Overview
 
+This project use Playwright for end-to-end testing. The tests cover various scenarios to ensure the robustness and reliability of your application.
 
-issues => Test timeout of 30000ms exceeded for webkit test
+Current valid scenario :  
+* Add all menus for hannong in basket and verify infos (prices, required items ...)
+
+## Installation
+
+Make sure you have Node.js installed on your machine.
+
+```bash
+npm install
+```
+
+## Run your test
+working as espected
+```bash
+
+npm run test
+npm run test:headless
+npm run test:debug
+```
+
+not working very well...
+```bash
+npm run test:ui
