@@ -23,7 +23,3 @@ npm run test
 npm run test:headless
 npm run test:debug
 ```
-
-not working very well...
-```bash
-npm run test:ui
