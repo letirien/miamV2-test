@@ -51,7 +51,6 @@ test.describe('Menu selection tests for hannong', () => {
       await test.step(`Testing menu item ${i}`, async () => {
         const currentMenu: MenuItem = await handleMenu(page, menus, i);
         menuSelected.push(currentMenu);
-        console.log(menuSelected);
 
         // Après avoir ajouté le dernier menu, vérifiez le panier
         if (i === menuCount - 1) {
@@ -77,19 +76,13 @@ async function checkBasket(page:Page){
         // Vérifier si l'URL contient le chemin spécifié
         expect(page.url()).toMatch(/\/order\/cart/);
 
-        // const h2 = page.locator('h2');
-        // await expect(h2).toHaveText('Vos Menu');
+        const h2 = page.locator('h2');
+        await expect(h2).toHaveText('Vos Menu');
+  
     
-        // Afficher l'URL actuelle pour le débogage
-        // console.log("URL actuelle:", page.url());
-    
-    
-        // // Vérifier si l'URL contient le chemin spécifié
-        // const menuItems = page.locator('xpath=//h2[contains(text(), "Vos Menu")]/following-sibling::div//ol/li');
         // // const menuNames = await menuItems.allTextContents();
         // console.log(await menuItems.count())
-        // await expect(menuItems).toHaveCount(menuSelected.length);
-    
+        // await expect(menuItems).toHaveCount(menuSelected.length);  
 }
 async function verifyBasket(page:Page, menuSelected:any) {
   // Convertir le prix total de la page en un format numérique
@@ -144,6 +137,8 @@ async function handleMenu(page: Page, menus: any, index: number): Promise<MenuIt
 
     let requiredTitleText = await requiredTitle.nth(j).textContent();
     let toGet = requiredTitleText?.includes('au moins') ? 3 : 1;
+    // cas particulier pour perso, coche tous
+    itemName === "Personnalisé" ? toGet = 6 : toGet
     let selectedIndex = toGet === 1 ? Math.floor(Math.random() * itemsCount) : 0;
     for (let n = 0; n < itemsCount && n < toGet; n++) {
       let itemIndex = toGet === 1 ? selectedIndex : n; 
@@ -152,27 +147,32 @@ async function handleMenu(page: Page, menus: any, index: number): Promise<MenuIt
       if (toGet === 1 && currentItemText?.includes('Frites')) {
         // Si "Frites" est sélectionné aléatoirement, appliquez une logique spécifique
         await handleFritesSelection(page, item, currentMenu);
-      } else {
+      }
+      else{
         // Si un autre élément est sélectionné ou si la logique "au moins" est appliquée
         await item.click();
         console.log(currentItemText, 'cliqué et ou sélectionné');
         if(currentItemText)
         currentMenu.menuItems.push(currentItemText.trim());
+
       }
       
     }
   }
   async function handleFritesSelection(page: Page, fritesItem: any, currentMenu: MenuItem) {
     await fritesItem.click();
-    const fritesOptions = fritesItem.locator('div:nth-child(2) > div > ol > div');
-    const fritesOptionsCount = await fritesOptions.count();
+    let fritesOptions = fritesItem.locator('div:nth-child(2) > div > ol > div');
+    let fritesOptionsCount = await fritesOptions.count();
   
     if (fritesOptionsCount > 0) {
-      const lastFritesOption = fritesOptions.nth(fritesOptionsCount - 1);
+      console.log(fritesOptionsCount)
+      let lastFritesOption = fritesOptions.nth(fritesOptionsCount - 1);
       await lastFritesOption.click();
+      
       let fritesOptionText = await lastFritesOption.textContent();
       console.log('accompagnement', fritesOptionText, 'pour frites');
       currentMenu.menuItems.push('Frites ' + fritesOptionText.trim());
+      
     }
   }
   await page.waitForTimeout(500);
