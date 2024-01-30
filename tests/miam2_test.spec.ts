@@ -138,7 +138,6 @@ async function handleMenu(page: Page, menus: any, index: number): Promise<MenuIt
     let requiredTitleText = await requiredTitle.nth(j).textContent();
     let toGet = requiredTitleText?.includes('au moins') ? 3 : 1;
     // cas particulier pour perso, coche tous
-    itemName === "Personnalisé" ? toGet = 6 : toGet
     let selectedIndex = toGet === 1 ? Math.floor(Math.random() * itemsCount) : 0;
     for (let n = 0; n < itemsCount && n < toGet; n++) {
       let itemIndex = toGet === 1 ? selectedIndex : n; 
@@ -147,13 +146,12 @@ async function handleMenu(page: Page, menus: any, index: number): Promise<MenuIt
       if (toGet === 1 && currentItemText?.includes('Frites')) {
         // Si "Frites" est sélectionné aléatoirement, appliquez une logique spécifique
         await handleFritesSelection(page, item, currentMenu);
+        
       }
       else{
         // Si un autre élément est sélectionné ou si la logique "au moins" est appliquée
         await item.click();
-        console.log(currentItemText, 'cliqué et ou sélectionné');
-        if(currentItemText)
-        currentMenu.menuItems.push(currentItemText.trim());
+        currentItemText  ? currentMenu.menuItems.push(currentItemText.trim()) : ''
 
       }
       
@@ -161,15 +159,13 @@ async function handleMenu(page: Page, menus: any, index: number): Promise<MenuIt
   }
   async function handleFritesSelection(page: Page, fritesItem: any, currentMenu: MenuItem) {
     await fritesItem.click();
-    let fritesOptions = fritesItem.locator('div:nth-child(2) > div > ol > div');
-    let fritesOptionsCount = await fritesOptions.count();
+    let fritesOption = fritesItem.locator('#BIPA');
+    // let fritesOptionsCount = await fritesOptions.count();
   
-    if (fritesOptionsCount > 0) {
-      console.log(fritesOptionsCount)
-      let lastFritesOption = fritesOptions.nth(fritesOptionsCount - 1);
-      await lastFritesOption.click();
+    if (fritesOption) {
+      await fritesOption.click();
       
-      let fritesOptionText = await lastFritesOption.textContent();
+      let fritesOptionText = await fritesOption.textContent();
       console.log('accompagnement', fritesOptionText, 'pour frites');
       currentMenu.menuItems.push('Frites ' + fritesOptionText.trim());
       
